@@ -1,0 +1,43 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: My workflow
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  scm-token-own: read
+  scm-token-org: read
+  id-token: write
+
+jobs:
+  build:
+    steps:
+      - name: Get source code
+        uses: cloudbees-io/checkout@v1
+
+      - name: Setup git credentials
+        uses: cloudbees-io/configure-git-global-credentials@v1
+
+      - name: Login to AWS
+        id: aws-login
+        uses: cloudbees-io/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ vars.oidc_staging_iam_role }}
+          role-duration-seconds: "3600"
+
+      - name: Configure container registry for AWS ECR
+        uses: cloudbees-io/configure-ecr-credentials@v1
+
+      - id: build-container
+        name: Build container image
+        uses: cloudbees-io/kaniko@v1
+        kind: build
+        with:
+          destination: 020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/vulnerable-image:tag0.6
+          tar-path: container-image.tar
+          build-args: USER=cbp,TOKEN=${{ secrets.GH_SECURITY_PAT }}
