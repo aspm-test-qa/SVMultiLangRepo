@@ -24,10 +24,10 @@ pipeline {
                 echo 'Registering the metadata'
                 echo 'Another echo to make the pipeline a bit more complex'
                 registerBuildArtifactMetadata(
-                    name: "build-artifacts-testing-jenkins",
-                    version: "Tag1",
+                    name: "vuln-image-artifacts-cbci",
+                    version: "Tag0.1",
                     type: "docker",
-                    url: "020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/vulnerable-image:Tag1",
+                    url: "020229604682.dkr.ecr.us-east-1.amazonaws.com/throwaway/actions/vulnerable-image:Tag0.1",
                     //digest: "6f637064707039346163663237383938",
                     label: "test-aspm"
                 )
